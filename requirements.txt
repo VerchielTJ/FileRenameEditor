@@ -1,0 +1,11 @@
+# FileRenameEditor 依赖包
+# 基础依赖（Python内置，无需安装）
+# tkinter - GUI界面
+# os, pathlib, shutil - 文件操作
+# re - 正则表达式
+# configparser - 配置管理
+# logging - 日志记录
+
+# 可选依赖（如果需要额外功能）
+# pillow>=8.0.0  # 图像处理（如果需要预览图片）
+# send2trash>=1.8.0  # 安全删除到回收站
