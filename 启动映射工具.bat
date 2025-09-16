@@ -1,67 +1,45 @@
 @echo off
 chcp 65001 >nul
-title 文件重命名工具 - 映射组件启动器
+title 文件重命名工具启动器
 
 :menu
 cls
 echo.
 echo ========================================
-echo    文件重命名工具 - 映射组件启动器
+echo        文件重命名工具启动器
 echo ========================================
 echo.
 echo 请选择要运行的程序:
 echo.
-echo [1] 最终版完整应用 (推荐)
-echo [2] 演示程序 (功能展示)
-echo [3] 基础测试程序
-echo [4] 检查Python环境
-echo [5] 查看使用说明
+echo [1] 启动文件重命名工具 (推荐)
+echo [2] 检查Python环境
+echo [3] 查看使用说明
 echo [0] 退出
 echo.
-set /p choice=请输入选择 (0-5): 
+set /p choice=请输入选择 (0-3): 
 
-if "%choice%"=="1" goto run_final
-if "%choice%"=="2" goto run_demo
-if "%choice%"=="3" goto run_test
-if "%choice%"=="4" goto check_python
-if "%choice%"=="5" goto show_help
+if "%choice%"=="1" goto run_app
+if "%choice%"=="2" goto check_python
+if "%choice%"=="3" goto show_help
 if "%choice%"=="0" goto exit
 echo 无效选择，请重新输入
 pause
 goto menu
 
-:run_final
+:run_app
 cls
-echo 正在启动最终版完整应用...
+echo 正在启动文件重命名工具...
 echo.
-python final_mapping_app.py
+python main.py
 if errorlevel 1 (
     echo.
     echo 程序运行出错，请检查错误信息
-    pause
-)
-goto menu
-
-:run_demo
-cls
-echo 正在启动演示程序...
-echo.
-python mapping_demo.py
-if errorlevel 1 (
+    echo 可能的原因:
+    echo 1. Python未正确安装
+    echo 2. 缺少必要的模块
+    echo 3. 文件路径问题
     echo.
-    echo 程序运行出错，请检查错误信息
-    pause
-)
-goto menu
-
-:run_test
-cls
-echo 正在启动测试程序...
-echo.
-python test_mapping.py
-if errorlevel 1 (
-    echo.
-    echo 程序运行出错，请检查错误信息
+    echo 请运行选项2检查Python环境
     pause
 )
 goto menu
@@ -82,9 +60,8 @@ if errorlevel 1 (
     echo.
     echo 检查必要的Python模块...
     python -c "import tkinter; print('tkinter模块: 正常')" 2>nul || echo tkinter模块: 缺失
-    python -c "import re; print('re模块: 正常')" 2>nul || echo re模块: 缺失
-    python -c "import json; print('json模块: 正常')" 2>nul || echo json模块: 缺失
     python -c "import os; print('os模块: 正常')" 2>nul || echo os模块: 缺失
+    python -c "import pathlib; print('pathlib模块: 正常')" 2>nul || echo pathlib模块: 缺失
 )
 echo.
 pause
@@ -96,18 +73,19 @@ echo ========================================
 echo           使用说明
 echo ========================================
 echo.
-echo 文件重命名工具 - 映射组件
+echo 文件重命名工具
 echo.
 echo 功能说明:
+echo - 添加前缀和后缀
 echo - 创建key-value映射规则
 echo - 批量替换文件名中的特定文本
-echo - 支持正则表达式
-echo - 配置保存和加载
+echo - 实时预览效果
+echo - 直观的图形界面
 echo.
 echo 使用步骤:
-echo 1. 选择要运行的程序
-echo 2. 在映射编辑中添加替换规则
-echo 3. 选择要处理的文件夹
+echo 1. 启动程序
+echo 2. 选择工作文件夹
+echo 3. 设置重命名规则（前缀、后缀、映射）
 echo 4. 预览重命名效果
 echo 5. 执行重命名操作
 echo.

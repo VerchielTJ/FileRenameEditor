@@ -1,24 +1,22 @@
-# 文件重命名工具 - 映射组件 PowerShell启动器
+# 文件重命名工具 PowerShell启动器
 # 设置控制台编码为UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # 设置窗口标题
-$Host.UI.RawUI.WindowTitle = "文件重命名工具 - 映射组件启动器"
+$Host.UI.RawUI.WindowTitle = "文件重命名工具启动器"
 
 function Show-Menu {
     Clear-Host
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "    文件重命名工具 - 映射组件启动器" -ForegroundColor Cyan
+    Write-Host "        文件重命名工具启动器" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "请选择要运行的程序:" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "[1] 最终版完整应用 (推荐)" -ForegroundColor Green
-    Write-Host "[2] 演示程序 (功能展示)" -ForegroundColor Green
-    Write-Host "[3] 基础测试程序" -ForegroundColor Green
-    Write-Host "[4] 检查Python环境" -ForegroundColor Green
-    Write-Host "[5] 查看使用说明" -ForegroundColor Green
+    Write-Host "[1] 启动文件重命名工具 (推荐)" -ForegroundColor Green
+    Write-Host "[2] 检查Python环境" -ForegroundColor Green
+    Write-Host "[3] 查看使用说明" -ForegroundColor Green
     Write-Host "[0] 退出" -ForegroundColor Red
     Write-Host ""
 }
@@ -49,7 +47,7 @@ function Test-PythonEnvironment {
     
     Write-Host ""
     Write-Host "检查Python模块..." -ForegroundColor Yellow
-    $modules = @("tkinter", "re", "json", "os")
+    $modules = @("tkinter", "os", "pathlib")
     foreach ($module in $modules) {
         try {
             python -c "import $module" 2>$null
@@ -74,18 +72,19 @@ function Show-Help {
     Write-Host "           使用说明" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "文件重命名工具 - 映射组件" -ForegroundColor Yellow
+    Write-Host "文件重命名工具" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "功能说明:" -ForegroundColor Green
+    Write-Host "- 添加前缀和后缀" -ForegroundColor White
     Write-Host "- 创建key-value映射规则" -ForegroundColor White
     Write-Host "- 批量替换文件名中的特定文本" -ForegroundColor White
-    Write-Host "- 支持正则表达式" -ForegroundColor White
-    Write-Host "- 配置保存和加载" -ForegroundColor White
+    Write-Host "- 实时预览效果" -ForegroundColor White
+    Write-Host "- 直观的图形界面" -ForegroundColor White
     Write-Host ""
     Write-Host "使用步骤:" -ForegroundColor Green
-    Write-Host "1. 选择要运行的程序" -ForegroundColor White
-    Write-Host "2. 在映射编辑中添加替换规则" -ForegroundColor White
-    Write-Host "3. 选择要处理的文件夹" -ForegroundColor White
+    Write-Host "1. 启动程序" -ForegroundColor White
+    Write-Host "2. 选择工作文件夹" -ForegroundColor White
+    Write-Host "3. 设置重命名规则（前缀、后缀、映射）" -ForegroundColor White
     Write-Host "4. 预览重命名效果" -ForegroundColor White
     Write-Host "5. 执行重命名操作" -ForegroundColor White
     Write-Host ""
@@ -111,6 +110,12 @@ function Run-Program {
         if ($LASTEXITCODE -ne 0) {
             Write-Host ""
             Write-Host "程序运行出错，请检查错误信息" -ForegroundColor Red
+            Write-Host "可能的原因:" -ForegroundColor Yellow
+            Write-Host "1. Python未正确安装" -ForegroundColor White
+            Write-Host "2. 缺少必要的模块" -ForegroundColor White
+            Write-Host "3. 文件路径问题" -ForegroundColor White
+            Write-Host ""
+            Write-Host "请运行选项2检查Python环境" -ForegroundColor Yellow
             Read-Host "按回车键继续"
         }
     } catch {
@@ -123,14 +128,12 @@ function Run-Program {
 # 主循环
 do {
     Show-Menu
-    $choice = Read-Host "请输入选择 (0-5)"
+    $choice = Read-Host "请输入选择 (0-3)"
     
     switch ($choice) {
-        "1" { Run-Program "最终版完整应用" "final_mapping_app.py" }
-        "2" { Run-Program "演示程序" "mapping_demo.py" }
-        "3" { Run-Program "基础测试程序" "test_mapping.py" }
-        "4" { Test-PythonEnvironment }
-        "5" { Show-Help }
+        "1" { Run-Program "文件重命名工具" "main.py" }
+        "2" { Test-PythonEnvironment }
+        "3" { Show-Help }
         "0" { 
             Write-Host ""
             Write-Host "感谢使用文件重命名工具！" -ForegroundColor Green

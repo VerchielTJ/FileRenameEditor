@@ -1,21 +1,23 @@
-﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-FileRenameEditor - 集成映射替换功能
-主程序入口
+主窗口视图 - 文件重命名工具的主界面
 """
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
-from mapping_widget import MappingListWidget
+from typing import Dict
+from .components.mapping_widget import MappingListWidget
 
 
-class FileRenameEditor:
-    def __init__(self):
+class MainWindow:
+    """主窗口类"""
+    
+    def __init__(self, controller):
+        self.controller = controller
         self.root = tk.Tk()
         self.root.title("文件重命名工具 - 支持映射替换")
-        self.root.geometry("900x700")
+        self.root.geometry("800x600")
         self.root.resizable(True, True)
         
         # 当前工作路径
@@ -37,30 +39,30 @@ class FileRenameEditor:
         # 配置网格权重
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
-        main_frame.columnconfigure(0, weight=1)
-        main_frame.rowconfigure(2, weight=1)
+        main_frame.columnconfigure(1, weight=1)
         
         # 标题
         title_label = ttk.Label(main_frame, text="文件重命名工具", 
                                font=("Arial", 16, "bold"))
-        title_label.grid(row=0, column=0, pady=(0, 20))
+        title_label.grid(row=0, column=0, columnspan=3, pady=(0, 20))
         
         # 路径选择区域
         self.create_path_section(main_frame, 1)
         
-        # 映射替换区域
-        self.create_mapping_section(main_frame, 2)
-        
         # 重命名设置区域
-        self.create_rename_section(main_frame, 3)
+        self.create_rename_section(main_frame, 2)
         
         # 状态显示区域
-        self.create_status_section(main_frame, 4)
+        self.create_status_section(main_frame, 3)
         
+        # 初始状态信息
+        self.update_status("欢迎使用文件重命名工具！\n")
+        self.update_status(f"当前工作路径: {self.current_path.get()}\n")
+    
     def create_path_section(self, parent, row):
         """创建路径选择区域"""
         path_frame = ttk.LabelFrame(parent, text="工作路径", padding="10")
-        path_frame.grid(row=row, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
+        path_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
         path_frame.columnconfigure(1, weight=1)
         
         # 路径标签
@@ -82,30 +84,10 @@ class FileRenameEditor:
                                 command=self.confirm_path)
         confirm_btn.grid(row=1, column=0, columnspan=3, pady=(10, 0))
     
-    def create_mapping_section(self, parent, row):
-        """创建映射替换区域"""
-        # 映射组件
-        self.mapping_widget = MappingListWidget(parent)
-        self.mapping_widget.frame.grid(row=row, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
-        
-        # 设置示例映射
-        example_mappings = {
-            "IMG_": "照片_",
-            "DSC_": "图片_",
-            "2023": "2023年",
-            "2024": "2024年",
-            "12": "12月",
-            "01": "01日",
-            "02": "02日",
-            "03": "03日",
-            "_": " "
-        }
-        self.mapping_widget.set_mappings(example_mappings)
-    
     def create_rename_section(self, parent, row):
         """创建重命名设置区域"""
         rename_frame = ttk.LabelFrame(parent, text="重命名设置", padding="10")
-        rename_frame.grid(row=row, column=0, sticky=(tk.W, tk.E), pady=(10, 0))
+        rename_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
         rename_frame.columnconfigure(1, weight=1)
         
         # 前缀设置
@@ -124,9 +106,12 @@ class FileRenameEditor:
                                      width=30, font=("Consolas", 10))
         self.suffix_entry.grid(row=1, column=1, sticky=(tk.W, tk.E), padx=(0, 10), pady=(10, 0))
         
-        # 按钮区域
+        # 映射列表组件
+        self.mapping_widget = MappingListWidget(rename_frame)
+        
+        # 重命名按钮
         button_frame = ttk.Frame(rename_frame)
-        button_frame.grid(row=2, column=0, columnspan=2, pady=(15, 0))
+        button_frame.grid(row=3, column=0, columnspan=3, pady=(15, 0))
         
         ttk.Button(button_frame, text="预览重命名", 
                   command=self.preview_rename).pack(side=tk.LEFT, padx=(0, 10))
@@ -136,7 +121,8 @@ class FileRenameEditor:
     def create_status_section(self, parent, row):
         """创建状态显示区域"""
         status_frame = ttk.LabelFrame(parent, text="状态信息", padding="10")
-        status_frame.grid(row=row, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(10, 0))
+        status_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), 
+                         pady=(10, 0))
         status_frame.columnconfigure(0, weight=1)
         status_frame.rowconfigure(0, weight=1)
         
@@ -149,15 +135,7 @@ class FileRenameEditor:
         
         self.status_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
-        
-        # 初始状态信息
-        self.update_status("欢迎使用文件重命名工具！\n")
-        self.update_status(f"当前工作路径: {self.current_path.get()}\n")
-        self.update_status("支持功能：\n")
-        self.update_status("1. 添加前缀和后缀\n")
-        self.update_status("2. 映射替换（将文件名中的指定文本替换为其他文本）\n")
-        self.update_status("3. 预览重命名结果\n")
-        
+    
     def browse_folder(self):
         """浏览文件夹"""
         folder_path = filedialog.askdirectory(
@@ -206,107 +184,34 @@ class FileRenameEditor:
     
     def preview_rename(self):
         """预览重命名"""
-        path = self.current_path.get().strip()
-        prefix = self.prefix.get().strip()
-        suffix = self.suffix.get().strip()
-        
-        if not path:
-            messagebox.showerror("错误", "请先确认工作路径！")
-            return
-        
-        try:
-            files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-            if not files:
-                messagebox.showwarning("警告", "该文件夹中没有文件！")
-                return
-            
-            self.update_status(f"\n重命名预览:\n")
-            self.update_status(f"前缀: '{prefix}'\n")
-            self.update_status(f"后缀: '{suffix}'\n")
-            self.update_status(f"映射替换: {len(self.mapping_widget.get_mappings())} 个规则\n\n")
-            
-            for file in files:
-                # 应用映射替换
-                mapped_name = self.mapping_widget.apply_mappings(file)
-                
-                # 分离文件名和扩展名
-                name, ext = os.path.splitext(mapped_name)
-                new_name = prefix + name + suffix + ext
-                
-                self.update_status(f"  {file} -> {new_name}\n")
-                
-        except Exception as e:
-            messagebox.showerror("错误", f"预览失败: {e}")
+        self.controller.preview_rename()
     
     def execute_rename(self):
         """执行重命名"""
-        path = self.current_path.get().strip()
-        prefix = self.prefix.get().strip()
-        suffix = self.suffix.get().strip()
-        
-        if not path:
-            messagebox.showerror("错误", "请先确认工作路径！")
-            return
-        
-        try:
-            files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-            if not files:
-                messagebox.showwarning("警告", "该文件夹中没有文件！")
-                return
-            
-            # 确认对话框
-            if not messagebox.askyesno("确认", f"确定要重命名 {len(files)} 个文件吗？"):
-                return
-            
-            self.update_status(f"\n开始重命名操作...\n")
-            
-            renamed_count = 0
-            for file in files:
-                try:
-                    # 应用映射替换
-                    mapped_name = self.mapping_widget.apply_mappings(file)
-                    
-                    # 分离文件名和扩展名
-                    name, ext = os.path.splitext(mapped_name)
-                    new_name = prefix + name + suffix + ext
-                    
-                    old_path = os.path.join(path, file)
-                    new_path = os.path.join(path, new_name)
-                    
-                    # 检查新文件名是否已存在
-                    if os.path.exists(new_path):
-                        self.update_status(f"跳过: {file} -> {new_name} (文件已存在)\n")
-                        continue
-                    
-                    # 执行重命名
-                    os.rename(old_path, new_path)
-                    self.update_status(f"✓ {file} -> {new_name}\n")
-                    renamed_count += 1
-                    
-                except Exception as e:
-                    self.update_status(f"✗ {file} -> {new_name} (错误: {e})\n")
-            
-            self.update_status(f"\n重命名完成！成功重命名 {renamed_count} 个文件\n")
-            
-        except Exception as e:
-            messagebox.showerror("错误", f"重命名操作失败: {e}")
-            
+        self.controller.execute_rename()
+    
     def update_status(self, message):
         """更新状态信息"""
         self.status_text.insert(tk.END, message)
         self.status_text.see(tk.END)
         self.root.update_idletasks()
-        
+    
+    def get_current_path(self) -> str:
+        """获取当前路径"""
+        return self.current_path.get().strip()
+    
+    def get_prefix(self) -> str:
+        """获取前缀"""
+        return self.prefix.get().strip()
+    
+    def get_suffix(self) -> str:
+        """获取后缀"""
+        return self.suffix.get().strip()
+    
+    def get_mappings(self) -> Dict[str, str]:
+        """获取映射字典"""
+        return self.mapping_widget.get_mappings()
+    
     def run(self):
         """运行应用程序"""
         self.root.mainloop()
-
-
-def main():
-    """主函数"""
-    app = FileRenameEditor()
-    app.run()
-
-
-if __name__ == "__main__":
-    main()
