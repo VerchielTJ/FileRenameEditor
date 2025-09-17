@@ -19,33 +19,40 @@ class MappingListWidget:
     def setup_ui(self):
         """设置映射列表界面"""
         # 映射列表框架
-        mapping_frame = ttk.LabelFrame(self.parent, text="映射替换设置", padding="10")
-        mapping_frame.grid(row=0, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
+        mapping_frame = ttk.LabelFrame(self.parent, text="映射替换设置", padding="15")
+        mapping_frame.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
         mapping_frame.columnconfigure(1, weight=1)
         
         # 输入区域
         input_frame = ttk.Frame(mapping_frame)
-        input_frame.grid(row=0, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        input_frame.grid(row=0, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
         input_frame.columnconfigure(1, weight=1)
         input_frame.columnconfigure(3, weight=1)
         
         # Key输入
-        ttk.Label(input_frame, text="查找内容:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
-        self.key_entry = ttk.Entry(input_frame, width=20, font=("Consolas", 10))
-        self.key_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 10))
+        ttk.Label(input_frame, text="查找内容:", font=("Arial", 10, "bold")).grid(row=0, column=0, sticky=tk.W, padx=(0, 8))
+        self.key_entry = ttk.Entry(input_frame, width=22, font=("Consolas", 11))
+        self.key_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 15))
         
         # Value输入
-        ttk.Label(input_frame, text="替换为:").grid(row=0, column=2, sticky=tk.W, padx=(0, 5))
-        self.value_entry = ttk.Entry(input_frame, width=20, font=("Consolas", 10))
-        self.value_entry.grid(row=0, column=3, sticky=(tk.W, tk.E), padx=(0, 10))
+        ttk.Label(input_frame, text="替换为:", font=("Arial", 10, "bold")).grid(row=0, column=2, sticky=tk.W, padx=(0, 8))
+        self.value_entry = ttk.Entry(input_frame, width=22, font=("Consolas", 11))
+        self.value_entry.grid(row=0, column=3, sticky=(tk.W, tk.E), padx=(0, 15))
         
         # 按钮
         button_frame = ttk.Frame(input_frame)
-        button_frame.grid(row=0, column=4, padx=(10, 0))
+        button_frame.grid(row=0, column=4, padx=(15, 0))
         
-        ttk.Button(button_frame, text="添加", command=self.add_mapping).grid(row=0, column=0, padx=(0, 5))
-        ttk.Button(button_frame, text="删除", command=self.delete_mapping).grid(row=0, column=1, padx=(0, 5))
-        ttk.Button(button_frame, text="清空", command=self.clear_mappings).grid(row=0, column=2)
+        # 按钮样式
+        button_style = ttk.Style()
+        button_style.configure("Mapping.TButton", font=("Arial", 9))
+        
+        ttk.Button(button_frame, text="添加", command=self.add_mapping, 
+                  style="Mapping.TButton").grid(row=0, column=0, padx=(0, 8))
+        ttk.Button(button_frame, text="删除", command=self.delete_mapping, 
+                  style="Mapping.TButton").grid(row=0, column=1, padx=(0, 8))
+        ttk.Button(button_frame, text="清空", command=self.clear_mappings, 
+                  style="Mapping.TButton").grid(row=0, column=2)
         
         # 映射列表显示
         list_frame = ttk.Frame(mapping_frame)
@@ -55,15 +62,15 @@ class MappingListWidget:
         
         # 创建Treeview显示映射列表
         columns = ("key", "value")
-        self.tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=6)
+        self.tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=8)
         
         # 设置列标题
         self.tree.heading("key", text="查找内容")
         self.tree.heading("value", text="替换为")
         
         # 设置列宽
-        self.tree.column("key", width=200)
-        self.tree.column("value", width=200)
+        self.tree.column("key", width=250)
+        self.tree.column("value", width=250)
         
         # 滚动条
         scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.tree.yview)
@@ -79,7 +86,7 @@ class MappingListWidget:
         info_label = ttk.Label(mapping_frame, 
                               text="说明：在文件名中查找左侧内容，替换为右侧内容。双击可编辑。",
                               font=("Arial", 9), foreground="gray")
-        info_label.grid(row=2, column=0, columnspan=3, pady=(10, 0))
+        info_label.grid(row=2, column=0, columnspan=3, pady=(15, 0))
     
     def add_mapping(self):
         """添加映射"""
