@@ -382,34 +382,34 @@ class MainWindow:
                 messagebox.showerror("错误", "加载配置文件失败！")
     
     def apply_config(self, config: Dict[str, Any]):
-        """应用配置到界面"""
+        """应用配置到界面 - 支持字段兼容性"""
         # 设置工作路径
-        if config.get("work_path"):
-            self.current_path.set(config["work_path"])
+        work_path = config.get("work_path", "")
+        self.current_path.set(work_path)
         
-        # 设置前缀、后缀和删除字符
-        if config.get("prefix"):
-            self.prefix.set(config["prefix"])
-        else:
-            self.prefix.set("")
+        # 设置前缀、后缀和删除字符（使用默认值处理缺失字段）
+        self.prefix.set(config.get("prefix", ""))
+        self.suffix.set(config.get("suffix", ""))
+        self.delete_chars.set(config.get("delete_chars", ""))
         
-        if config.get("suffix"):
-            self.suffix.set(config["suffix"])
-        else:
-            self.suffix.set("")
-        
-        if config.get("delete_chars"):
-            self.delete_chars.set(config["delete_chars"])
-        else:
-            self.delete_chars.set("")
-        
-        # 设置映射
+        # 应用映射规则
         mappings = config.get("mappings", {})
-        self.mapping_widget.set_mappings(mappings)
+        if hasattr(self, 'mapping_widget'):
+            self.mapping_widget.set_mappings(mappings)
         
-        # 更新状态
-        self.update_status(f"已加载配置: {config.get('name', '未命名配置')}\n")
-        self.update_status(f"工作路径: {config.get('work_path', '')}\n")
+        # 显示配置加载信息
+        config_name = config.get("name", "未命名配置")
+        version = config.get("version", "未知版本")
+        
+        # 检查是否有未知字段
+        unknown_fields = self.config_manager.get_unknown_fields(config)
+        if unknown_fields:
+            unknown_info = f"\n注意: 配置包含 {len(unknown_fields)} 个未知字段，已保留在内存中"
+        else:
+            unknown_info = ""
+        
+        self.update_status(f"已加载配置: {config_name} (版本: {version}){unknown_info}\n")
+        self.update_status(f"工作路径: {work_path}\n")
         self.update_status(f"前缀: {config.get('prefix', '')}\n")
         self.update_status(f"后缀: {config.get('suffix', '')}\n")
         self.update_status(f"删除字符: {config.get('delete_chars', '')}\n")
