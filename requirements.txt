@@ -1,16 +1,38 @@
-# FileRenameEditor 依赖包
-# 基础依赖（Python内置，无需安装）
-# tkinter - GUI界面
-# os, pathlib, shutil - 文件操作
-# re - 正则表达式
-# configparser - 配置管理
-# logging - 日志记录
+# FileRenameEditor Dependencies
+# 
+# This project uses only Python standard library modules, so no external dependencies are required.
+# The following modules are used and are included with Python:
+# - tkinter: GUI framework
+# - os, pathlib, shutil: File operations
+# - re: Regular expressions
+# - configparser: Configuration management
+# - logging: Logging functionality
+# - typing: Type hints support
 
-# 开发依赖（可选）
+# Development Dependencies (Optional)
+# Uncomment the following lines if you want to contribute to the project:
+
+# Testing
 # pytest>=6.0.0
+# pytest-cov>=2.10.0
+
+# Code formatting and linting
 # black>=21.0.0
 # flake8>=3.8.0
+# mypy>=0.910
 
-# 可选依赖（如果需要额外功能）
-# pillow>=8.0.0  # 图像处理（如果需要预览图片）
-# send2trash>=1.8.0  # 安全删除到回收站
+# Documentation
+# sphinx>=4.0.0
+# sphinx-rtd-theme>=0.5.0
+
+# Optional Dependencies (for enhanced features)
+# Uncomment if you need additional functionality:
+
+# Image processing (for image preview features)
+# pillow>=8.0.0
+
+# Safe file deletion (for moving files to trash)
+# send2trash>=1.8.0
+
+# Enhanced file operations
+# pathlib2>=2.3.0  # For older Python versions

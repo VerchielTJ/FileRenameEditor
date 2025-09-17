@@ -25,18 +25,30 @@ class RenameController:
         
         return result
     
+    def apply_delete_chars(self, filename: str, delete_chars: str) -> str:
+        """应用删除字符"""
+        if not delete_chars:
+            return filename
+        
+        result = filename
+        for char in delete_chars:
+            result = result.replace(char, "")
+        
+        return result
+    
     def preview_rename(self):
         """预览重命名"""
         path = self.view.get_current_path()
         prefix = self.view.get_prefix()
         suffix = self.view.get_suffix()
+        delete_chars = self.view.get_delete_chars()
         mappings = self.view.get_mappings()
         
         if not path:
             self.view.update_status("错误：请先确认工作路径！\n")
             return
         
-        if not prefix and not suffix and not mappings:
+        if not prefix and not suffix and not delete_chars and not mappings:
             self.view.update_status("错误：请至少设置一种重命名方式！\n")
             return
         
@@ -49,6 +61,7 @@ class RenameController:
             self.view.update_status(f"\n重命名预览:\n")
             self.view.update_status(f"前缀: '{prefix}'\n")
             self.view.update_status(f"后缀: '{suffix}'\n")
+            self.view.update_status(f"删除字符: '{delete_chars}'\n")
             
             if mappings:
                 self.view.update_status(f"映射替换: {len(mappings)} 条规则\n")
@@ -59,8 +72,11 @@ class RenameController:
                 # 应用映射替换
                 mapped_name = self.apply_mappings(file, mappings)
                 
+                # 应用删除字符
+                deleted_name = self.apply_delete_chars(mapped_name, delete_chars)
+                
                 # 分离文件名和扩展名
-                name, ext = os.path.splitext(mapped_name)
+                name, ext = os.path.splitext(deleted_name)
                 new_name = prefix + name + suffix + ext
                 
                 if file != new_name:
@@ -76,13 +92,14 @@ class RenameController:
         path = self.view.get_current_path()
         prefix = self.view.get_prefix()
         suffix = self.view.get_suffix()
+        delete_chars = self.view.get_delete_chars()
         mappings = self.view.get_mappings()
         
         if not path:
             self.view.update_status("错误：请先确认工作路径！\n")
             return
         
-        if not prefix and not suffix and not mappings:
+        if not prefix and not suffix and not delete_chars and not mappings:
             self.view.update_status("错误：请至少设置一种重命名方式！\n")
             return
         
@@ -104,8 +121,11 @@ class RenameController:
                 # 应用映射替换
                 mapped_name = self.apply_mappings(file, mappings)
                 
+                # 应用删除字符
+                deleted_name = self.apply_delete_chars(mapped_name, delete_chars)
+                
                 # 分离文件名和扩展名
-                name, ext = os.path.splitext(mapped_name)
+                name, ext = os.path.splitext(deleted_name)
                 new_name = prefix + name + suffix + ext
                 
                 if file == new_name:

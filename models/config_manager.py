@@ -27,6 +27,7 @@ class ConfigManager:
             "work_path": "",
             "prefix": "",
             "suffix": "",
+            "delete_chars": "",
             "mappings": {},
             # 未来可扩展的字段
             "settings": {
@@ -40,6 +41,7 @@ class ConfigManager:
                      work_path: str,
                      prefix: str = "",
                      suffix: str = "",
+                     delete_chars: str = "",
                      mappings: Dict[str, str] = None,
                      name: str = "",
                      description: str = "") -> Dict[str, Any]:
@@ -57,6 +59,7 @@ class ConfigManager:
             "work_path": work_path,
             "prefix": prefix,
             "suffix": suffix,
+            "delete_chars": delete_chars,
             "mappings": mappings
         })
         
@@ -104,7 +107,7 @@ class ConfigManager:
         """验证配置文件格式"""
         try:
             # 检查必需字段
-            required_fields = ["version", "work_path", "prefix", "suffix", "mappings"]
+            required_fields = ["version", "work_path", "prefix", "suffix", "delete_chars", "mappings"]
             for field in required_fields:
                 if field not in config:
                     print(f"配置文件缺少必需字段: {field}")
@@ -121,6 +124,10 @@ class ConfigManager:
             
             if not isinstance(config["suffix"], str):
                 print("suffix 必须是字符串")
+                return False
+            
+            if not isinstance(config["delete_chars"], str):
+                print("delete_chars 必须是字符串")
                 return False
             
             if not isinstance(config["mappings"], dict):
@@ -150,7 +157,7 @@ class ConfigManager:
         merged = base_config.copy()
         
         # 更新基本字段
-        for key in ["name", "description", "work_path", "prefix", "suffix"]:
+        for key in ["name", "description", "work_path", "prefix", "suffix", "delete_chars"]:
             if key in new_config:
                 merged[key] = new_config[key]
         
@@ -179,6 +186,7 @@ class ConfigManager:
 工作路径: {info['work_path']}
 前缀: {config.get('prefix', '')}
 后缀: {config.get('suffix', '')}
+删除字符: {config.get('delete_chars', '')}
 映射规则数量: {len(mappings)}
 创建时间: {info['created_at']}
 更新时间: {info['updated_at']}

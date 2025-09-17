@@ -25,9 +25,10 @@ class MainWindow:
         self.current_path = tk.StringVar()
         self.current_path.set(os.getcwd())
         
-        # 前缀和后缀
+        # 前缀、后缀和删除字符
         self.prefix = tk.StringVar()
         self.suffix = tk.StringVar()
+        self.delete_chars = tk.StringVar()
         
         # 配置管理器
         self.config_manager = ConfigManager()
@@ -109,27 +110,36 @@ class MainWindow:
         rename_frame.grid(row=row, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
         rename_frame.columnconfigure(1, weight=1)
         
-        # 前缀和后缀设置区域
+        # 前缀、后缀和删除字符设置区域
         prefix_suffix_frame = ttk.Frame(rename_frame)
         prefix_suffix_frame.grid(row=0, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 15))
         prefix_suffix_frame.columnconfigure(1, weight=1)
         prefix_suffix_frame.columnconfigure(3, weight=1)
+        prefix_suffix_frame.columnconfigure(5, weight=1)
         
         # 前缀设置
         prefix_label = ttk.Label(prefix_suffix_frame, text="添加前缀:", font=("Arial", 10, "bold"))
-        prefix_label.grid(row=0, column=0, sticky=tk.W, padx=(0, 10))
+        prefix_label.grid(row=0, column=0, sticky=tk.W, padx=(0, 8))
         
         self.prefix_entry = ttk.Entry(prefix_suffix_frame, textvariable=self.prefix, 
-                                     width=25, font=("Consolas", 11))
-        self.prefix_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 20))
+                                     width=20, font=("Consolas", 11))
+        self.prefix_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 15))
         
         # 后缀设置
         suffix_label = ttk.Label(prefix_suffix_frame, text="添加后缀:", font=("Arial", 10, "bold"))
-        suffix_label.grid(row=0, column=2, sticky=tk.W, padx=(0, 10))
+        suffix_label.grid(row=0, column=2, sticky=tk.W, padx=(0, 8))
         
         self.suffix_entry = ttk.Entry(prefix_suffix_frame, textvariable=self.suffix, 
-                                     width=25, font=("Consolas", 11))
-        self.suffix_entry.grid(row=0, column=3, sticky=(tk.W, tk.E))
+                                     width=20, font=("Consolas", 11))
+        self.suffix_entry.grid(row=0, column=3, sticky=(tk.W, tk.E), padx=(0, 15))
+        
+        # 删除字符设置
+        delete_label = ttk.Label(prefix_suffix_frame, text="删除字符:", font=("Arial", 10, "bold"))
+        delete_label.grid(row=0, column=4, sticky=tk.W, padx=(0, 8))
+        
+        self.delete_chars_entry = ttk.Entry(prefix_suffix_frame, textvariable=self.delete_chars, 
+                                           width=20, font=("Consolas", 11))
+        self.delete_chars_entry.grid(row=0, column=5, sticky=(tk.W, tk.E))
         
         # 映射列表组件
         self.mapping_widget = MappingListWidget(rename_frame)
@@ -240,6 +250,10 @@ class MainWindow:
         """获取后缀"""
         return self.suffix.get().strip()
     
+    def get_delete_chars(self) -> str:
+        """获取删除字符"""
+        return self.delete_chars.get().strip()
+    
     def get_mappings(self) -> Dict[str, str]:
         """获取映射字典"""
         return self.mapping_widget.get_mappings()
@@ -250,6 +264,7 @@ class MainWindow:
         work_path = self.get_current_path()
         prefix = self.get_prefix()
         suffix = self.get_suffix()
+        delete_chars = self.get_delete_chars()
         mappings = self.get_mappings()
         
         if not work_path:
@@ -257,9 +272,9 @@ class MainWindow:
             return
         
         # 创建保存配置对话框
-        self.show_save_config_dialog(work_path, prefix, suffix, mappings)
+        self.show_save_config_dialog(work_path, prefix, suffix, delete_chars, mappings)
     
-    def show_save_config_dialog(self, work_path: str, prefix: str, suffix: str, mappings: Dict[str, str]):
+    def show_save_config_dialog(self, work_path: str, prefix: str, suffix: str, delete_chars: str, mappings: Dict[str, str]):
         """显示保存配置对话框"""
         dialog = tk.Toplevel(self.root)
         dialog.title("保存工作配置")
@@ -298,6 +313,7 @@ class MainWindow:
         preview_content = f"""工作路径: {work_path}
 前缀: {prefix or '(无)'}
 后缀: {suffix or '(无)'}
+删除字符: {delete_chars or '(无)'}
 映射规则: {len(mappings)} 条"""
         
         if mappings:
@@ -334,6 +350,7 @@ class MainWindow:
                     work_path=work_path,
                     prefix=prefix,
                     suffix=suffix,
+                    delete_chars=delete_chars,
                     mappings=mappings,
                     name=name,
                     description=description
@@ -370,7 +387,7 @@ class MainWindow:
         if config.get("work_path"):
             self.current_path.set(config["work_path"])
         
-        # 设置前缀和后缀
+        # 设置前缀、后缀和删除字符
         if config.get("prefix"):
             self.prefix.set(config["prefix"])
         else:
@@ -381,6 +398,11 @@ class MainWindow:
         else:
             self.suffix.set("")
         
+        if config.get("delete_chars"):
+            self.delete_chars.set(config["delete_chars"])
+        else:
+            self.delete_chars.set("")
+        
         # 设置映射
         mappings = config.get("mappings", {})
         self.mapping_widget.set_mappings(mappings)
@@ -390,6 +412,7 @@ class MainWindow:
         self.update_status(f"工作路径: {config.get('work_path', '')}\n")
         self.update_status(f"前缀: {config.get('prefix', '')}\n")
         self.update_status(f"后缀: {config.get('suffix', '')}\n")
+        self.update_status(f"删除字符: {config.get('delete_chars', '')}\n")
         self.update_status(f"映射规则: {len(mappings)} 条\n")
     
     def show_config_manager(self):
