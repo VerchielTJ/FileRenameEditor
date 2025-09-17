@@ -26,15 +26,43 @@ class RenameController:
         return result
     
     def apply_delete_chars(self, filename: str, delete_chars: str) -> str:
-        """应用删除字符"""
+        """应用删除字符 - 整段匹配删除"""
         if not delete_chars:
             return filename
         
         result = filename
-        for char in delete_chars:
-            result = result.replace(char, "")
+        
+        # 检查是否包含逗号分隔符
+        if ',' in delete_chars:
+            # 按逗号分割，支持多个删除模式
+            delete_patterns = [pattern.strip() for pattern in delete_chars.split(',') if pattern.strip()]
+        else:
+            # 单个删除模式
+            delete_patterns = [delete_chars]
+        
+        for pattern in delete_patterns:
+            # 整段匹配删除
+            result = result.replace(pattern, "")
         
         return result
+    
+    def apply_prefix_suffix(self, filename: str, prefix: str, suffix: str) -> str:
+        """智能应用前缀和后缀 - 避免重复添加"""
+        if not prefix and not suffix:
+            return filename
+        
+        # 分离文件名和扩展名
+        name, ext = os.path.splitext(filename)
+        
+        # 检查并添加前缀
+        if prefix and not name.startswith(prefix):
+            name = prefix + name
+        
+        # 检查并添加后缀
+        if suffix and not name.endswith(suffix):
+            name = name + suffix
+        
+        return name + ext
     
     def preview_rename(self):
         """预览重命名"""
@@ -75,9 +103,8 @@ class RenameController:
                 # 应用删除字符
                 deleted_name = self.apply_delete_chars(mapped_name, delete_chars)
                 
-                # 分离文件名和扩展名
-                name, ext = os.path.splitext(deleted_name)
-                new_name = prefix + name + suffix + ext
+                # 智能应用前缀和后缀
+                new_name = self.apply_prefix_suffix(deleted_name, prefix, suffix)
                 
                 if file != new_name:
                     self.view.update_status(f"  {file} -> {new_name}\n")
@@ -124,9 +151,8 @@ class RenameController:
                 # 应用删除字符
                 deleted_name = self.apply_delete_chars(mapped_name, delete_chars)
                 
-                # 分离文件名和扩展名
-                name, ext = os.path.splitext(deleted_name)
-                new_name = prefix + name + suffix + ext
+                # 智能应用前缀和后缀
+                new_name = self.apply_prefix_suffix(deleted_name, prefix, suffix)
                 
                 if file == new_name:
                     self.view.update_status(f"跳过: {file} (无变化)\n")

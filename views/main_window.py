@@ -141,6 +141,12 @@ class MainWindow:
                                            width=20, font=("Consolas", 11))
         self.delete_chars_entry.grid(row=0, column=5, sticky=(tk.W, tk.E))
         
+        # 删除字符说明
+        delete_help_label = ttk.Label(prefix_suffix_frame, 
+                                     text="(整段匹配删除，多个用逗号分隔)",
+                                     font=("Arial", 8), foreground="gray")
+        delete_help_label.grid(row=1, column=4, columnspan=2, sticky=tk.W, pady=(2, 0))
+        
         # 映射列表组件
         self.mapping_widget = MappingListWidget(rename_frame)
         
