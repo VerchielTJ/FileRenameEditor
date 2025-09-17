@@ -325,7 +325,7 @@ class MainWindow:
                 title="保存配置文件",
                 defaultextension=".fre",
                 filetypes=[("文件重命名配置", "*.fre"), ("所有文件", "*.*")],
-                initialname=f"{name}.fre"
+                initialfile=f"{name}.fre"
             )
             
             if file_path:
